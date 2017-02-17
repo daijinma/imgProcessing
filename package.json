@@ -5,7 +5,7 @@
   "main": "index.js",
   "directories": {
     "test": "test",
-    "build": "electron-packager . imgProcessing --platform=darwin --version=1.4.13 --arch=x64 --ignore=node_modules/electron-* --electron-version=1.4.13"
+    "build": "electron-packager . imgProcessing --platform=darwin --arch=x64 --ignore=node_modules/electron-* --electron-version=1.4.13"
   },
   "dependencies": {
     "bootstrap": "^3.3.7",

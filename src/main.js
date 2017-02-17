@@ -1,12 +1,12 @@
 var ipc = require('electron').ipcRenderer;
+var ipcMain = require('electron').ipcMain;
+
 var remote = require('electron').remote;
 var dialog = remote.dialog;
 var vm = new Vue({
 	el:'#app',
 	data:{
-		originFiles:[
-			'D:\\daijnma\\test\\Electron\\imgElectron\\test\\主播@2\\1.png',
-		],
+		originFiles:[],
 		doActionArray:{
 			do:[
 				{
@@ -96,7 +96,3 @@ var vm = new Vue({
 		}
 	}
 });
-
-openClip = function(){
-	ipc.send('jcropShow', this.originFiles[0]);
-}
