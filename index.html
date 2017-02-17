@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>图片批处理</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="stylesheet" href="./node_modules/bootstrap/dist/css/bootstrap.css">
+    <link rel="stylesheet" href="./src/main.css">
+  </head>
+  <body>
+  	<div class="site-wrapper" id='app'>
+
+      <div class="site-wrapper-inner" >
+
+        <div class="cover-container">
+
+          <div class="masthead clearfix">
+            <div class="inner">
+              <h3 class="masthead-brand">图片批处理</h3>
+              <nav>
+                <ul class="nav masthead-nav">
+                	<li class="active"><a href="#">Home</a></li>
+					<li><a href="#" @click='openJcrop()'>图片裁剪</a></li>
+                </ul>
+              </nav>
+            </div>
+          </div>
+
+          <div class="inner cover">
+            <h1 class="cover-heading">选择文件.</h1>
+            <p class="lead">666</p>
+            <p class="lead">
+              <a href="#"  @click="openFile"  class="btn btn-lg btn-default">add images</a>
+            </p>
+            <table class="table">
+		      <caption>文件列表({{originFiles.length}})</caption>
+		      <thead>
+		        <tr>
+		          <th>#</th>
+		          <th>path</th>
+		          <th></th>
+		        </tr>
+		      </thead>
+		      <tbody>
+		        <tr class="text-left" v-for='(item, index) in originFiles'>
+		          <th scope="row" v-text='index'></th>
+		          <td>{{item}}</td>
+		          <td><a href="#"  @click="delFile(index)"  class="btn btn-danger">删除</a></td>
+		        </tr>
+		      </tbody>
+		    </table>
+		    <div v-if='originFiles.length==0'>
+		    	nothing
+		    </div>
+	
+			<table class="table">
+		      <caption>操作</caption>
+		      <thead>
+		        <tr>
+		          <th>操作</th>
+		          <th>选项</th>
+		        </tr>
+		      </thead>
+		      <tbody>
+		        <tr class="text-left" v>
+		        	<th scope="row">变量</th>
+			        <td>
+			          	<form class="form-inline">
+					      <div class="form-group">
+					        <label>
+					        	<input v-model='useNumber' type="checkbox">提取数字为'<kbd>$1</kbd>'
+					        </label>
+					      </div>
+					    </form>
+			        </td>
+			    </tr>
+			    <tr class="text-left" >
+			        <th scope="row">改名</th>
+			        <td>
+			          	<form class="form-inline">
+					      <div class="form-group">
+					        <label class="sr-only" for="exampleInputAmount"></label>
+					        <div class="input-group">
+					          <input type="text"  class="form-control" id="exampleInputAmount" v-model='rename'>
+					        </div>
+					      </div>
+					    </form>
+			        </td>
+		        </tr>
+		        <tr class="text-left" v-show='false'>
+			        <th scope="row">裁剪</th>
+			        <td>
+			          	<a href="#"  @click=""   class="btn btn-default">裁剪</a>
+			          	<p class="tips small">
+			          		以第一张图为模板，余下图按第一张图方案裁剪
+			          	</p>	
+			        </td>
+		        </tr>
+		        <tr class="text-left">
+			        <th scope="row">缩放</th>
+			        <td>
+			        	<div class="row">
+				        	<div class="col-sm-4 col-xs-4 col-md-4">
+					          	<div class="input-group">
+						        	<div class="input-group-addon">宽</div>
+						        	<input type="text" placeholder="auto" v-model='resizeW' class="form-control" id="resizeWidth">
+						        	<div class="input-group-addon">px</div>
+						        </div>
+					        </div>	
+					        <div class="col-sm-4 col-xs-4 col-md-4">
+					          	<div class="input-group">
+						        	<div class="input-group-addon">高</div>
+						        	<input type="text" placeholder="auto" v-model='resizeH' class="form-control" id="resizeHeight">
+						        	<div class="input-group-addon">px</div>
+						        </div>
+					        </div>	
+			        	</div>
+			        	
+			        </td>
+		        </tr>
+		        <tr class="text-left" v>
+			        <th scope="row">导出</th>
+			        <td>
+			          	<a href="#"  @click="distFile()" ref='outPutPath'  class="btn btn-default">导出地址</a>
+			        </td>
+		        </tr>
+		        <tr class="text-left" v>
+			        <th scope="row"></th>
+			        <td>
+					    <button type="submit" @click='doControll' class="btn btn-primary">执行</button>
+			        </td>
+		        </tr>
+		      </tbody>
+		    </table>
+		    
+          </div>
+
+          <div class="mastfoot">
+            <div class="inner">
+              <p>
+				We are using io.js <script>document.write(process.version)</script>
+    and Electron <script>document.write(process.versions['electron'])</script>.
+              </p>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+    
+    <script src='./node_modules/vue/dist/vue.js'></script>
+    <script src='./src/main.js'></script>
+  </body>
+</html>

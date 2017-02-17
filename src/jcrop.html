@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>图片批处理</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.css">
+    <link rel="stylesheet" href="./main.css">
+    <link rel="stylesheet" href="./css/jquery.Jcrop.css">
+	<style>
+		#imgCover{
+			position: relative;
+		}
+		.jcrop-holder{
+			position: absolute;
+			left:50%;
+			top:50%;
+			transform: translate(-50%, -50%);
+		}
+
+		.jcrop-keymgr{opacity: 0;}
+	</style>
+  </head>
+  <body>
+  	<div id='imgCover'>
+  		<img id='img' src="" alt="">
+  	</div>
+  	<div class="hide">
+  		<canvas id="canvas"></canvas>
+  	</div>
+	<div class="container" id="coords">
+		<div class="row" >
+			<div class="col-md-4 col-xs-4">
+				<div class="input-group">
+		        	<div class="input-group-addon">X1</div>
+		        	<input type="text" class="form-control" id="x1">
+		        	<div class="input-group-addon">px</div>
+		        </div>
+			</div>
+			<div class="col-md-4 col-xs-4">
+				<div class="input-group">
+		        	<div class="input-group-addon">Y1</div>
+		        	<input type="text" class="form-control" id="y1">
+		        	<div class="input-group-addon">px</div>
+		        </div>
+			</div>
+		</div>
+		</br>
+		<div class="row" >
+			<div class="col-md-4 col-xs-4">
+				<div class="input-group">
+		        	<div class="input-group-addon">X2</div>
+		        	<input type="text" class="form-control" id="x2">
+		        	<div class="input-group-addon">px</div>
+		        </div>
+			</div>
+			<div class="col-md-4 col-xs-4">
+				<div class="input-group">
+		        	<div class="input-group-addon">Y2</div>
+		        	<input type="text" class="form-control" id="y2">
+		        	<div class="input-group-addon">px</div>
+		        </div>
+			</div>
+			<div class="col-md-4 col-xs-4">
+				<button type="submit" id='sure' class="btn btn-primary">确定</button>
+				&nbsp;
+				<button type="submit" id='cancal' class="btn btn-default">取消</button>
+			</div>
+		</div>
+		</br>
+		<div class="row" >
+			<div class="col-md-4 col-xs-4">
+				<div class="input-group">
+		        	<div class="input-group-addon">W</div>
+		        	<input type="text" class="form-control" id="w">
+		        	<div class="input-group-addon">px</div>
+		        </div>
+			</div>
+			<div class="col-md-4 col-xs-4">
+				<div class="input-group">
+		        	<div class="input-group-addon">H</div>
+		        	<input type="text" class="form-control" id="h">
+		        	<div class="input-group-addon">px</div>
+		        </div>
+			</div>
+
+		</div>
+	</div>
+  	
+  	<script src='./js/jquery.min.js'></script>
+  	<script src='./js/jquery.Jcrop.js'></script>
+  	<script>
+  		var remote = require('electron').remote;
+		var dialog = remote.dialog;
+  		var ipc = require('electron').ipcRenderer;
+  		var global = remote.getGlobal('sharedObject').jcrop;
+  		var img = document.getElementById('img');
+  		img.src = global.img;
+
+  		$('#imgCover').css('width',global.width).css('height',global.height)
+  	</script>
+  	<script>
+  		var jcrop_api;
+  		var jcropVal = '';
+
+	    $(img).Jcrop({
+	      onChange:   showCoords,
+	      onSelect:   showCoords,
+	      onRelease:  clearCoords
+	    },function(){
+	      jcrop_api = this;
+	    });
+
+	    $('#coords').on('change','input',function(e){
+	      var x1 = $('#x1').val(),
+	         x2 = $('#x2').val(),
+	         y1 = $('#y1').val(),
+	         y2 = $('#y2').val(),
+	         w = $('#w').val(),
+	         h = $('#w').val();
+
+	         var tar = e.target.id.toLowerCase();
+	         if(tar=='w'){
+	         	x2 = parseInt(x1)+parseInt(w);
+	         }
+	         if(tar=='h'){
+	         	y2 = parseInt(y1)+parseInt(h);
+	         }
+	        jcrop_api.setSelect([x1,y1,x2,y2]);
+	    });
+
+
+	    $("#sure").click(function(){
+	    	var base64 = draw('canvas',jcropVal);
+
+
+			dialog.showSaveDialog({
+				title:'保存',
+				properties: ['createDirectory'],
+				filters: [
+					{name: 'Images', extensions: ['jpg', 'png']},
+				]
+			}, function(optional){
+				console.log(optional)
+
+				if('[object Array]' === Object.prototype.toString.call(optional)){
+					optional = optional[0]
+				}
+
+				var data = {
+					url :optional,
+					base64:base64
+				}
+
+				ipc.send('jcropHide', JSON.stringify(data))
+
+			})
+	    })
+	    $("#cancel").click(function(){
+			ipc.send('jcropHide')
+	    })
+
+
+	    function showCoords(c){
+		    $('#x1').val(c.x);
+		    $('#y1').val(c.y);
+		    $('#x2').val(c.x2);
+		    $('#y2').val(c.y2);
+		    $('#w').val(c.w);
+		    $('#h').val(c.h);
+		    jcropVal = c;
+		}
+
+		function clearCoords(){
+		    $('#coords input').val('');
+		};
+
+
+		function draw(id,opt){
+			var canvas = document.getElementById(id);
+			var ctx = canvas.getContext("2d");
+			canvas.width = opt.w;
+			canvas.height = opt.h;
+			ctx.drawImage(img, opt.x, opt.y, opt.w, opt.h, 0, 0, opt.w, opt.h);
+			return canvas.toDataURL()
+		}
+
+  	</script>
+  </body>
+</html>
